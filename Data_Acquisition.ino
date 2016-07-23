@@ -14,6 +14,26 @@
 // Hardware SPI
 Adafruit_LIS3DH lis = Adafruit_LIS3DH(LIS3DH_CS);
 
+union Elapsed{
+  unsigned long t_f;
+  byte t_b[4];
+}Elapsed ;
+
+union x_acel{
+  float x_f;
+  byte x_b[4];
+}x_acel;
+
+union y_acel{
+  float y_f;
+  byte y_b[4];
+}y_acel;
+
+union z_acel{
+  float z_f;
+  byte z_b[4];
+}z_acel;
+
 void setup(void) {
   Serial.begin(9600);
 
@@ -30,35 +50,18 @@ void loop() {
     if (r == (byte)'s') {
       unsigned long startTime = micros();
       for (int i = 0; i < 100; i++) {
-        unsigned long elapsedTime = micros() - startTime;
+        Elapsed.t_f = micros() - startTime;
         lis.read();
-        sendStream(elapsedTime, lis.x_g, lis.y_g, lis.z_g);
+        x_acel.x_f = lis.x_g;
+        y_acel.y_f = lis.y_g;
+        z_acel.z_f = lis.z_g;
+        Serial.write(Elapsed.t_b, 4);
+        Serial.write(x_acel.x_b, 4);
+        Serial.write(y_acel.y_b, 4);
+        Serial.write(z_acel.z_b, 4);
       }
     }
   }
   delay(10);
 }
 
-void sendStream(unsigned long elapsedTime, float X_g, float Y_g, float Z_g) {
-  byte * t = (byte *) &elapsedTime;
-  byte * x = (byte *) &X_g;
-  byte * y = (byte *) &Y_g;
-  byte * z = (byte *) &Z_g;
-
-  Serial.write(t[0]);
-  Serial.write(t[1]);
-  Serial.write(t[2]);
-  Serial.write(t[3]);
-  Serial.write(x[0]);
-  Serial.write(x[1]);
-  Serial.write(x[2]);
-  Serial.write(x[3]);
-  Serial.write(y[0]);
-  Serial.write(y[1]);
-  Serial.write(y[2]);
-  Serial.write(y[3]);
-  Serial.write(z[0]);
-  Serial.write(z[1]);
-  Serial.write(z[2]);
-  Serial.write(z[3]);
-}
