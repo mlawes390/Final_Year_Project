@@ -41,15 +41,17 @@ def main(args):
         try:
             while True:
                 raw = ser.read(16)
+                if len(raw)==0:
+                    print('Program End')
+                    sys.exit(0)
                 data = struct.unpack('Ifff',raw)
                 writer.writerow(data)
-        except KeyboardInterrupt, TimeoutError:
-            # end read when keyboard interrupt or no data
-            # send in 5 seconds
-            print('Program end')
+        except KeyboardInterrupt:
+            # end read when keyboard interrupt
+            print('Program end: User interrupt')
             sys.exit(0)
             
 if __name__ == '__main__':
     args = docopt.docopt(__doc__, version=__version__)
-    print(args)
+    #print(args)
     main(args)
