@@ -15,9 +15,14 @@ May need to add user to `dialout` group to access serial ports
 
   `sudo usermod -a -G dialout $USER`
   
-  Program requires `PySerial` and `Docopt`. Install with:
+Data Acquisition requires `PySerial` and `Docopt`. Install with:
   
    `pip3 install pyserial docopt`
+
+Processing requires `numpy`, `scipy` and `matplotlib`. Install with:
+
+  `sudo apt-get install python-scipy python-numpy python-matplotlib`
+
 
 
 Usage (Sensor Node)
