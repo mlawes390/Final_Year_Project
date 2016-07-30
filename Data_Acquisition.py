@@ -32,12 +32,11 @@ def main(args):
                         timeout=int(args['--timeout']))
     # Allow time for serial to initlise and send start byte
     time.sleep(10)
-    ser.write(b's')
 
     # open .csv file with write
     with open(save_file, 'w') as f:
         writer = csv.writer(f)
-        
+        ser.write(b's')
         try:
             while True:
                 raw = ser.read(16)
