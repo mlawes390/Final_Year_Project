@@ -65,9 +65,9 @@ def main(args):
     
     #Plot Frequency Domain
     plt.subplot (3,1,2)
-    plt.plot (freq[1:], X_am, '-b', label='X axis')
-    plt.plot (freq[1:], Y_am, '-r', label='Y axis')
-    plt.plot (freq[1:], Z_am, '-g', label='Z axis')
+    plt.plot (freq[1:], X_am[1:], '-b', label='X axis')
+    plt.plot (freq[1:], Y_am[1:], '-r', label='Y axis')
+    plt.plot (freq[1:], Z_am[1:], '-g', label='Z axis')
     plt.title('Frequency Domain')
     plt.legend()
     plt.xlabel('Frequency (Hz)')
