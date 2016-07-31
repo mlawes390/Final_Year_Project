@@ -5,7 +5,7 @@ Reads accererometer data .csv file and processes
 Usage: Processing.py [options]
 
 Options:
-    -i=READ_FILE           The file to read from [Default: ./data.csv
+    -i=READ_FILE           The file to read from [Default: ./data.csv]
     -h --help              Show this help information
     -V --version           Print the version information
 """
@@ -38,13 +38,13 @@ def main(args):
     freq = k/T
     freq = freq[range(n/2)]
     
-    #Compute fft and single sided power spectrum (removing DC component)
-    X_fft = scipy.fftpack.rfft(acel_data[:,1])
-    X_p = np.abs(X_fft)**2
-    Y_fft = scipy.fftpack.rfft(acel_data[:,2])
-    Y_p = np.abs(Y_fft)**2
-    Z_fft = scipy.fftpack.rfft(acel_data[:,3])
-    Z_p = np.abs(Z_fft)**2
+    #Compute fft and single sided amplitude spectrum (removing DC component)
+    X_fft = np.abs(scipy.fftpack.rfft(acel_data[:,1]))
+    X_am = np.abs(X_fft[range(n/2)]/n)
+    Y_fft = np.abs(scipy.fftpack.rfft(acel_data[:,2]))
+    Y_am = np.abs(Y_fft[range(n/2)]/n)
+    Z_fft = np.abs(scipy.fftpack.rfft(acel_data[:,3]))
+    Z_am = np.abs(Z_fft[range(n/2)]/n)
     
     #Compute real Cepstrum
     X_ceps = np.real(np.fft.ifft(np.log(X_fft)))
@@ -61,13 +61,13 @@ def main(args):
     plt.title('Time Domain')
     plt.legend()
     plt.xlabel('Time (s)')
-    ply.ylabel('Acceleration (m/s^2)')
+    plt.ylabel('Acceleration (m/s^2)')
     
     #Plot Frequency Domain
     plt.subplot (3,1,2)
-    plt.plot (freq[1:], X_p, '-b', label='X axis')
-    plt.plot (freq[1:], Y_p, '-r', label='Y axis')
-    plt.plot (freq[1:], Z_p, '-g', label='Z axis')
+    plt.plot (freq[1:], X_am, '-b', label='X axis')
+    plt.plot (freq[1:], Y_am, '-r', label='Y axis')
+    plt.plot (freq[1:], Z_am, '-g', label='Z axis')
     plt.title('Frequency Domain')
     plt.legend()
     plt.xlabel('Frequency (Hz)')
@@ -81,7 +81,7 @@ def main(args):
     plt.title('Real Cepstrum Analysis')
     plt.legend()
     plt.xlabel('Time (s)')
-    ply.ylabel('Amplitude (dB)')
+    plt.ylabel('Amplitude (dB)')
     
 if __name__ == '__main__':
     args = docopt.docopt(__doc__, version=__version__)
