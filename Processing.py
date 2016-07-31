@@ -38,19 +38,20 @@ def main(args):
     freq = k/T
     freq = freq[range(n/2)]
     
-    #Compute fft (removing DC component)
-    X_fft = scipy.fftpack.fft(acel_data[:,1])/n
-    X_fft = 2.0/n*np.abs(X_fft[1:n/2])
-    Y_fft = scipy.fftpack.fft(acel_data[:,2])/n
-    Y_fft = 2.0/n*np.abs(Y_fft[1:n/2])
-    Z_fft = scipy.fftpack.fft(acel_data[:,3])/n
-    Z_fft = 2.0/n*np.abs(Z_fft[1:n/2])
+    #Compute fft and single sided power spectrum (removing DC component)
+    X_fft = scipy.fftpack.rfft(acel_data[:,1])
+    X_p = np.abs(X_fft)**2
+    Y_fft = scipy.fftpack.rfft(acel_data[:,2])
+    Y_p = np.abs(Y_fft)**2
+    Z_fft = scipy.fftpack.rfft(acel_data[:,3])
+    Z_p = np.abs(Z_fft)**2
     
-    #Compute Cepstrum
-    #X_ceps = np.ifft(np.log(X_fft))
-    #Y_ceps = np.ifft(np.log(Y_fft))
-    #Z_ceps = np.ifft(np.log(Z_fft))
+    #Compute real Cepstrum
+    X_ceps = np.real(np.fft.ifft(np.log(X_fft)))
+    Y_ceps = np.real(np.fft.ifft(np.log(Y_fft)))
+    Z_ceps = np.real(np.fft.ifft(np.log(Z_fft)))
     
+    #Convert Acceleration to velocity ion frequency domain
     
     #Plot Time Domain
     plt.subplot (3,1,1)
@@ -64,16 +65,23 @@ def main(args):
     
     #Plot Frequency Domain
     plt.subplot (3,1,2)
-    plt.plot (freq[1:], X_fft, '-b', label='X axis')
-    plt.plot (freq[1:], Y_fft, '-r', label='Y axis')
-    plt.plot (freq[1:], Z_fft, '-g', label='Z axis')
+    plt.plot (freq[1:], X_p, '-b', label='X axis')
+    plt.plot (freq[1:], Y_p, '-r', label='Y axis')
+    plt.plot (freq[1:], Z_p, '-g', label='Z axis')
     plt.title('Frequency Domain')
     plt.legend()
     plt.xlabel('Frequency (Hz)')
     plt.ylabel('Magnitude')
     
     #Plot Cepstrum Analysis
-    
+    plt.subplot (3,1,3)
+    plt.plot (acel_data[:,0], X_ceps, '-b', label='X axis')
+    plt.plot (acel_data[:,0], Y_ceps, '-r', label='Y axis')
+    plt.plot (acel_data[:,0], Z_ceps, '-g', label='Y axis')
+    plt.title('Real Cepstrum Analysis')
+    plt.legend()
+    plt.xlabel('Time (s)')
+    ply.ylabel('Amplitude (dB)')
     
 if __name__ == '__main__':
     args = docopt.docopt(__doc__, version=__version__)
