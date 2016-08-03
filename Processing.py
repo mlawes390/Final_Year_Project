@@ -13,15 +13,18 @@ __version__ = '0.1.0'
 
 import time
 import sys
+import os
 import docopt
 
 import csv
 import numpy as np
 import matplotlib.pyplot as plt
 import scipy.fftpack
+import scipy.stats
 
 def main(args):
     read_file = args.get('-i', './data.csv')
+    (path, extension) = os.path.split(read_file)
     
     #Read input file into a numpy array
     acel_data = np.genfromtxt(read_file, delimiter=",")
@@ -50,8 +53,6 @@ def main(args):
     X_ceps = np.real(np.fft.ifft(np.log(X_fft)))
     Y_ceps = np.real(np.fft.ifft(np.log(Y_fft)))
     Z_ceps = np.real(np.fft.ifft(np.log(Z_fft)))
-    
-    #Convert Acceleration to velocity ion frequency domain
     
     #Plot Time Domain
     plt.subplot (3,1,1)
@@ -82,6 +83,35 @@ def main(args):
     plt.legend()
     plt.xlabel('Time (s)')
     plt.ylabel('Amplitude (dB)')
+    
+    #Save figure
+    plt.tight_layout()
+    plt.savefig(path, format=png)
+    
+    #Calculate Velocity Time Domain
+    
+    #Calculate Time Domain parameters (in m/s^2)
+    X_mean = np.mean(acel_data[:,1])
+    X_min = np.amin(acel_data[:,1])
+    X_max = np.amax(acel_data[:,1])
+    X_p2v = X_max - X_min
+    X_rms = np.sqrt(np.mean(np.square(acel_data[:,1])))
+    X_cst = X_p2p/X_rms
+    X_kts = scipy.stats.kurtosis(acel_data[:,1]
+    
+    #Write time domain parameters to text file
+    with open(os.path.join(path, ".txt"),'w') as t:
+        t.write("Sample time (sec): " + str(acel_data[n,0]) + "\n")
+        t.write("Number of Samples: " +str(n) + "\n")
+        t.write("Sample rate (Hz): " + str(Fs) + "\n")
+        t.write("\n")
+        t.write("X Axis")
+        t.write("Mean (m/s^2): " + str(X_mean) + "\n")
+        t.write("RMS (m/s^2): " + str(X_rms) + "\n")
+        t.write("Peak to valley (m/s^2): " + str(X_p2v) + "\n")
+        t.write("Crest Factor: " + str(X_cst) + "\n")
+        t.write('Kurtosis: " + str(X_kts) + "\n")
+    
     
 if __name__ == '__main__':
     args = docopt.docopt(__doc__, version=__version__)
