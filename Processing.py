@@ -24,7 +24,7 @@ import scipy.stats
 
 def main(args):
     read_file = args.get('-i', './data.csv')
-    (path, extension) = os.path.split(read_file)
+    (path, extension) = os.path.splitext(read_file)
     
     #Read input file into a numpy array
     acel_data = np.genfromtxt(read_file, delimiter=",")
