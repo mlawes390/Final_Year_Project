@@ -86,7 +86,7 @@ def main(args):
     
     #Save figure
     plt.tight_layout()
-    plt.savefig(path, format=png)
+    plt.savefig(path, format='png')
     
     #Calculate Velocity Time Domain
     
@@ -96,18 +96,18 @@ def main(args):
     X_max = np.amax(acel_data[:,1])
     X_p2v = X_max - X_min
     X_rms = np.sqrt(np.mean(np.square(acel_data[:,1])))
-    X_cst = X_p2p/X_rms
+    X_cst = X_p2v/X_rms
     X_kts = scipy.stats.kurtosis(acel_data[:,1]
     
     #Write time domain parameters to text file
-    with open(os.path.join(path, ".txt"),'w') as t:
-        t.write("Sample time (sec): " + str(acel_data[n,0]) + "\n")
+    with open(path + '.txt','w') as t:
+        t.write("Sample time (sec): " + str(acel_data[n-1,0]) + "\n")
         t.write("Number of Samples: " +str(n) + "\n")
         t.write("Sample rate (Hz): " + str(Fs) + "\n")
         t.write("\n")
-        t.write("X Axis")
+        t.write("X Axis" + "\n")
         t.write("Mean (m/s^2): " + str(X_mean) + "\n")
-        t.write("RMS (m/s^2): " + str(X_rms) + "\n")
+        t.write("G RMS (m/s^2): " + str(X_rms) + "\n")
         t.write("Peak to valley (m/s^2): " + str(X_p2v) + "\n")
         t.write("Crest Factor: " + str(X_cst) + "\n")
         t.write('Kurtosis: " + str(X_kts) + "\n")
