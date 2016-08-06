@@ -42,11 +42,11 @@ def main(args):
     freq = freq[range(n/2)]
     
     #Compute fft and single sided amplitude spectrum (removing DC component)
-    X_fft = np.abs(scipy.fftpack.rfft(acel_data[:,1]))
+    X_fft = np.abs(scipy.fftpack.fft(acel_data[:,1]))
     X_am = np.abs(X_fft[range(n/2)]/n)
-    Y_fft = np.abs(scipy.fftpack.rfft(acel_data[:,2]))
+    Y_fft = np.abs(scipy.fftpack.fft(acel_data[:,2]))
     Y_am = np.abs(Y_fft[range(n/2)]/n)
-    Z_fft = np.abs(scipy.fftpack.rfft(acel_data[:,3]))
+    Z_fft = np.abs(scipy.fftpack.fft(acel_data[:,3]))
     Z_am = np.abs(Z_fft[range(n/2)]/n)
     
     #Compute real Cepstrum
@@ -97,7 +97,7 @@ def main(args):
     X_p2v = X_max - X_min
     X_rms = np.sqrt(np.mean(np.square(acel_data[:,1])))
     X_cst = X_p2v/X_rms
-    X_kts = scipy.stats.kurtosis(acel_data[:,1]
+    X_kts = scipy.stats.kurtosis(acel_data[:,1])
     
     #Write time domain parameters to text file
     with open(path + '.txt','w') as t:
@@ -110,7 +110,7 @@ def main(args):
         t.write("G RMS (m/s^2): " + str(X_rms) + "\n")
         t.write("Peak to valley (m/s^2): " + str(X_p2v) + "\n")
         t.write("Crest Factor: " + str(X_cst) + "\n")
-        t.write('Kurtosis: " + str(X_kts) + "\n")
+        t.write("Kurtosis: " + str(X_kts) + "\n")
     
     
 if __name__ == '__main__':
