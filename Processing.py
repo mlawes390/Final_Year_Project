@@ -69,7 +69,7 @@ def main(args):
     plt.subplot(3, 1, 1)
     plt.plot(acel_data[:, 0], acel_data[:, 1], '-b', label='X axis')
     plt.plot(acel_data[:, 0], acel_data[:, 2], '-r', label='Y axis')
-    plt.plot(acel_data[:, 0], acel_data[:, 3], '-g', label='Y axis')
+    plt.plot(acel_data[:, 0], acel_data[:, 3], '-g', label='Z axis')
     plt.title('Time Domain')
     plt.legend()
     plt.xlabel('Time (s)')
@@ -83,13 +83,14 @@ def main(args):
     plt.title('Frequency Domain')
     plt.legend()
     plt.xlabel('Frequency (Hz)')
+    
     plt.ylabel('Magnitude')
 
     # Plot Cepstrum Analysis
     plt.subplot(3, 1, 3)
     plt.plot(acel_data[:, 0], x_ceps, '-b', label='X axis')
     plt.plot(acel_data[:, 0], y_ceps, '-r', label='Y axis')
-    plt.plot(acel_data[:, 0], z_ceps, '-g', label='Y axis')
+    plt.plot(acel_data[:, 0], z_ceps, '-g', label='Z axis')
     plt.title('Real Cepstrum Analysis')
     plt.legend()
     plt.xlabel('Time (s)')
