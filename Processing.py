@@ -17,8 +17,9 @@ import os
 import docopt
 
 import numpy as np
+from numpy.fft import ifft
 import matplotlib.pyplot as plt
-import scipy.fftpack
+from scipy.fftpack import fft
 import scipy.stats
 
 
@@ -52,17 +53,17 @@ def main(args):
     freq = freq[range(int(n / 2))]
 
     # Compute fft and single sided amplitude spectrum (removing DC component)
-    x_fft = np.abs(scipy.fftpack.fft(acel_data[:, 1]))
+    x_fft = np.abs(fft(acel_data[:, 1]))
     x_am = np.abs(x_fft[range(int(n / 2))] / n)
-    y_fft = np.abs(scipy.fftpack.fft(acel_data[:, 2]))
+    y_fft = np.abs(fft(acel_data[:, 2]))
     y_am = np.abs(y_fft[range(int(n / 2))] / n)
-    z_fft = np.abs(scipy.fftpack.fft(acel_data[:, 3]))
+    z_fft = np.abs(fft(acel_data[:, 3]))
     z_am = np.abs(z_fft[range(int(n / 2))] / n)
 
     # Compute real Cepstrum
-    x_ceps = np.real(np.fft.ifft(np.log(x_fft)))
-    y_ceps = np.real(np.fft.ifft(np.log(y_fft)))
-    z_ceps = np.real(np.fft.ifft(np.log(z_fft)))
+    x_ceps = np.real(ifft(np.log(x_fft)))
+    y_ceps = np.real(ifft(np.log(y_fft)))
+    z_ceps = np.real(ifft(np.log(z_fft)))
 
     # Plot Time Domain
     plt.subplot(3, 1, 1)
@@ -96,7 +97,7 @@ def main(args):
 
     # Save figure
     plt.tight_layout()
-    plt.savefig(path, format='png')
+    plt.savefig(path + '.png', format='png')
 
     # Calculate Time Domain parameters (in m/s^2)
     ax = ('X', 'Y', 'Z')
