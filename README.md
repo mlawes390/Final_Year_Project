@@ -7,19 +7,19 @@ Sensor node is an ATmega328 with STMicroelectronics LIS3DH accelerometer
 Usage (Master Node)
 -----
 
-Retrieve local copy of code with::
+Retrieve local copy of code with:
 
     git clone https://github.com/mlawes390/Final_Year_Project.git
 
-May need to add user to `dialout` group to access serial ports::
+May need to add user to `dialout` group to access serial ports:
 
     sudo usermod -a -G dialout $USER
   
-Data Acquisition requires `PySerial` and `Docopt`. Install with::
+Data Acquisition requires `PySerial` and `Docopt`. Install with:
   
     pip3 install pyserial docopt
 
-Processing requires `numpy`, `scipy` and `matplotlib`. Install with::
+Processing requires `numpy`, `scipy` and `matplotlib`. Install with:
 
     sudo apt-get install python-scipy python-numpy python-matplotlib
 
@@ -28,11 +28,11 @@ Processing requires `numpy`, `scipy` and `matplotlib`. Install with::
 Usage (Sensor Node)
 -----
 
-Retrieve local copy of code with::
+Retrieve local copy of code with:
 
     git clone https://github.com/mlawes390/Final_Year_Project.git
 
-Retrieve Adafruit LIS3DH libraries from::
+Retrieve Adafruit LIS3DH libraries from:
 
     https://github.com/adafruit/Adafruit_LIS3DH
 
