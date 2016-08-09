@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Reads accererometer data sent through via the sensor node and
+Reads accelerometer data sent through via the sensor node and
 saves as a .csv file
 
 Usage: Data_Acquisition.py [options]
@@ -25,7 +25,7 @@ import docopt
 
 def main(args):
     save_file = args.get('-o', './data.csv')
-    
+
     # Open serial connection with node
     ser = serial.Serial(args['--port'],
                         baudrate=int(args['--baud']),
@@ -49,7 +49,7 @@ def main(args):
             # end read when keyboard interrupt
             print('Program end: User interrupt')
             sys.exit(0)
-            
+
 if __name__ == '__main__':
     args = docopt.docopt(__doc__, version=__version__)
     #print(args)
