@@ -1,122 +1,123 @@
 #!/usr/bin/env python3
 """
-Reads accererometer data .csv file and processes
+Reads accelerometer data .csv file and generates plots of time domain, frequency
+domain, and cepstrum analysis. Time domain is analysed and results stored in a
+.txt file
 
 Usage: Processing.py [options]
 
 Options:
-    -i=READ_FILE           The file to read from [Default: ./data.csv]
+    -i=READ_FILE           The file to read from [Default: ./test.csv]
     -h --help              Show this help information
     -V --version           Print the version information
 """
 __version__ = '0.1.0'
 
-import time
-import sys
 import os
 import docopt
 
-import csv
 import numpy as np
 import matplotlib.pyplot as plt
 import scipy.fftpack
 import scipy.stats
 
+
+def write_td(t, ax, mean, rms, p2v, cst, kts):
+    t.write("\n")
+    t.write(ax + " Axis" + "\n")
+    t.write("Mean (m/s^2): " + str(mean) + "\n")
+    t.write("G RMS (m/s^2): " + str(rms) + "\n")
+    t.write("Peak to valley (m/s^2): " + str(p2v) + "\n")
+    t.write("Crest Factor: " + str(cst) + "\n")
+    t.write("Kurtosis: " + str(kts) + "\n")
+
+
 def main(args):
     read_file = args.get('-i', './data.csv')
     (path, extension) = os.path.splitext(read_file)
-    
-    #Read input file into a numpy array
+
+    # Read input file into a numpy array
     acel_data = np.genfromtxt(read_file, delimiter=",")
-    
-    #carry out conversions (microseconds to seconds, g to m/s^2)
-    acel_data[:,0] = acel_data[:,0]/1000000
-    acel_data[:,1:3] = acel_data[:,1:3]*9.81
-    
-    #Define Frequency parameters
-    n = len(acel_data[:,0])             #Length of signal
+
+    # carry out conversions (microseconds to seconds, g to m/s^2)
+    acel_data[:, 0] = acel_data[:, 0] / 1000000
+    acel_data[:, 1:3] = acel_data[:, 1:3] * 9.81
+
+    # Define Frequency parameters
+    n = len(acel_data[:, 0])  # Length of signal
     k = np.arange(n)
-    Fs = n/(acel_data[n-1,0]-acel_data[0,0])
-    T = n/Fs
-    freq = k/T
-    freq = freq[range(n/2)]
-    
-    #Compute fft and single sided amplitude spectrum (removing DC component)
-    X_fft = np.abs(scipy.fftpack.fft(acel_data[:,1]))
-    X_am = np.abs(X_fft[range(n/2)]/n)
-    Y_fft = np.abs(scipy.fftpack.fft(acel_data[:,2]))
-    Y_am = np.abs(Y_fft[range(n/2)]/n)
-    Z_fft = np.abs(scipy.fftpack.fft(acel_data[:,3]))
-    Z_am = np.abs(Z_fft[range(n/2)]/n)
-    
-    #Compute real Cepstrum
-    X_ceps = np.real(np.fft.ifft(np.log(X_fft)))
-    Y_ceps = np.real(np.fft.ifft(np.log(Y_fft)))
-    Z_ceps = np.real(np.fft.ifft(np.log(Z_fft)))
-    
-    #Plot Time Domain
-    plt.subplot (3,1,1)
-    plt.plot (acel_data[:,0], acel_data[:,1], '-b', label='X axis')
-    plt.plot (acel_data[:,0], acel_data[:,2], '-r', label='Y axis')
-    plt.plot (acel_data[:,0], acel_data[:,3], '-g', label='Y axis')
+    fs = n / (acel_data[n - 1, 0] - acel_data[0, 0])
+    t = n / fs
+    freq = k / t
+    freq = freq[range(int(n / 2))]
+
+    # Compute fft and single sided amplitude spectrum (removing DC component)
+    x_fft = np.abs(scipy.fftpack.fft(acel_data[:, 1]))
+    x_am = np.abs(x_fft[range(int(n / 2))] / n)
+    y_fft = np.abs(scipy.fftpack.fft(acel_data[:, 2]))
+    y_am = np.abs(y_fft[range(int(n / 2))] / n)
+    z_fft = np.abs(scipy.fftpack.fft(acel_data[:, 3]))
+    z_am = np.abs(z_fft[range(int(n / 2))] / n)
+
+    # Compute real Cepstrum
+    x_ceps = np.real(np.fft.ifft(np.log(x_fft)))
+    y_ceps = np.real(np.fft.ifft(np.log(y_fft)))
+    z_ceps = np.real(np.fft.ifft(np.log(z_fft)))
+
+    # Plot Time Domain
+    plt.subplot(3, 1, 1)
+    plt.plot(acel_data[:, 0], acel_data[:, 1], '-b', label='X axis')
+    plt.plot(acel_data[:, 0], acel_data[:, 2], '-r', label='Y axis')
+    plt.plot(acel_data[:, 0], acel_data[:, 3], '-g', label='Y axis')
     plt.title('Time Domain')
     plt.legend()
     plt.xlabel('Time (s)')
     plt.ylabel('Acceleration (m/s^2)')
-    
-    #Plot Frequency Domain
-    plt.subplot (3,1,2)
-    plt.plot (freq[1:], X_am[1:], '-b', label='X axis')
-    plt.plot (freq[1:], Y_am[1:], '-r', label='Y axis')
-    plt.plot (freq[1:], Z_am[1:], '-g', label='Z axis')
+
+    # Plot Frequency Domain
+    plt.subplot(3, 1, 2)
+    plt.plot(freq[1:], x_am[1:], '-b', label='X axis')
+    plt.plot(freq[1:], y_am[1:], '-r', label='Y axis')
+    plt.plot(freq[1:], z_am[1:], '-g', label='Z axis')
     plt.title('Frequency Domain')
     plt.legend()
     plt.xlabel('Frequency (Hz)')
     plt.ylabel('Magnitude')
-    
-    #Plot Cepstrum Analysis
-    plt.subplot (3,1,3)
-    plt.plot (acel_data[:,0], X_ceps, '-b', label='X axis')
-    plt.plot (acel_data[:,0], Y_ceps, '-r', label='Y axis')
-    plt.plot (acel_data[:,0], Z_ceps, '-g', label='Y axis')
+
+    # Plot Cepstrum Analysis
+    plt.subplot(3, 1, 3)
+    plt.plot(acel_data[:, 0], x_ceps, '-b', label='X axis')
+    plt.plot(acel_data[:, 0], y_ceps, '-r', label='Y axis')
+    plt.plot(acel_data[:, 0], z_ceps, '-g', label='Y axis')
     plt.title('Real Cepstrum Analysis')
     plt.legend()
     plt.xlabel('Time (s)')
     plt.ylabel('Amplitude (dB)')
-    
-    #Save figure
+
+    # Save figure
     plt.tight_layout()
     plt.savefig(path, format='png')
-    
-    #Calculate Velocity Time Domain
-    
-    #Calculate Time Domain parameters (in m/s^2)
-    X_mean = np.mean(acel_data[:,1])
-    X_min = np.amin(acel_data[:,1])
-    X_max = np.amax(acel_data[:,1])
-    X_p2v = X_max - X_min
-    X_rms = np.sqrt(np.mean(np.square(acel_data[:,1])))
-    X_cst = X_p2v/X_rms
-    X_kts = scipy.stats.kurtosis(acel_data[:,1])
-    
-    #Write time domain parameters to text file
-    with open(path + '.txt','w') as t:
-        t.write("Sample time (sec): " + str(acel_data[n-1,0]) + "\n")
-        t.write("Number of Samples: " +str(n) + "\n")
-        t.write("Sample rate (Hz): " + str(Fs) + "\n")
-        t.write("\n")
-        t.write("X Axis" + "\n")
-        t.write("Mean (m/s^2): " + str(X_mean) + "\n")
-        t.write("G RMS (m/s^2): " + str(X_rms) + "\n")
-        t.write("Peak to valley (m/s^2): " + str(X_p2v) + "\n")
-        t.write("Crest Factor: " + str(X_cst) + "\n")
-        t.write("Kurtosis: " + str(X_kts) + "\n")
-    
-    
+
+    # Calculate Time Domain parameters (in m/s^2)
+    ax = ('X', 'Y', 'Z')
+    mean = np.mean(acel_data[:, 1:], axis=0)
+    min_ = np.amin(acel_data[:, 1:], axis=0)
+    max_ = np.amax(acel_data[:, 1:], axis=0)
+    p2v = max_ - min_
+    rms = np.sqrt(np.mean(np.square(acel_data[:, 1:]), axis=0))
+    cst = p2v / rms
+    kts = scipy.stats.kurtosis(acel_data[:, 1:])
+
+    # Write time domain parameters to text file
+    with open(path + '.txt', 'w') as t:
+        t.write("Sample time (sec): " + str(acel_data[n - 1, 0]) + "\n")
+        t.write("Number of Samples: " + str(n) + "\n")
+        t.write("Sample rate (Hz): " + str(fs) + "\n")
+        for i in range(3):
+            write_td(t, ax[i], mean[i], rms[i], p2v[i], cst[i], kts[i])
+
+
 if __name__ == '__main__':
     args = docopt.docopt(__doc__, version=__version__)
-    #print(args)
-    main(args) 
-    
-    
-    
+    # print(args)
+    main(args)
