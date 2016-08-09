@@ -7,7 +7,7 @@ domain, and cepstrum analysis. Time domain is analysed and results stored in a
 Usage: Processing.py [options]
 
 Options:
-    -i=READ_FILE           The file to read from [Default: ./test.csv]
+    -o=READ_FILE           The file to read from [Default: ./test.csv]
     -h --help              Show this help information
     -V --version           Print the version information
 """
@@ -34,7 +34,7 @@ def write_td(t, ax, mean, rms, p2v, cst, kts):
 
 
 def main(args):
-    read_file = args.get('-i', './data.csv')
+    read_file = args.get('-o', './test.csv')
     (path, extension) = os.path.splitext(read_file)
 
     # Read input file into a numpy array
@@ -83,7 +83,7 @@ def main(args):
     plt.title('Frequency Domain')
     plt.legend()
     plt.xlabel('Frequency (Hz)')
-    
+
     plt.ylabel('Magnitude')
 
     # Plot Cepstrum Analysis
