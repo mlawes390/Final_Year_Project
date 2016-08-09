@@ -1,2 +1,5 @@
 *.txt
 *.png
+*.pyc
+__pycache__
+.cache
