@@ -52,7 +52,7 @@ def main(args):
     freq = k / t
     freq = freq[range(int(n / 2))]
 
-    # Compute fft and single sided amplitude spectrum (removing DC component)
+    # Compute fft and single sided amplitude spectrum
     x_fft = np.abs(fft(acel_data[:, 1]))
     x_am = np.abs(x_fft[range(int(n / 2))] / n)
     y_fft = np.abs(fft(acel_data[:, 2]))
@@ -65,13 +65,14 @@ def main(args):
     y_ceps = np.real(ifft(np.log(y_fft)))
     z_ceps = np.real(ifft(np.log(z_fft)))
 
+    plt.figure(figsize=(12.8, 7.2), dpi=100)
     # Plot Time Domain
     plt.subplot(3, 1, 1)
     plt.plot(acel_data[:, 0], acel_data[:, 1], '-b', label='X axis')
     plt.plot(acel_data[:, 0], acel_data[:, 2], '-r', label='Y axis')
     plt.plot(acel_data[:, 0], acel_data[:, 3], '-g', label='Z axis')
     plt.title('Time Domain')
-    plt.legend()
+    plt.legend(loc=1, fontsize=10)
     plt.xlabel('Time (s)')
     plt.ylabel('Acceleration (m/s^2)')
 
@@ -81,9 +82,8 @@ def main(args):
     plt.plot(freq[1:], y_am[1:], '-r', label='Y axis')
     plt.plot(freq[1:], z_am[1:], '-g', label='Z axis')
     plt.title('Frequency Domain')
-    plt.legend()
+    plt.legend(loc=1, fontsize=10)
     plt.xlabel('Frequency (Hz)')
-
     plt.ylabel('Magnitude')
 
     # Plot Cepstrum Analysis
@@ -92,7 +92,7 @@ def main(args):
     plt.plot(acel_data[:, 0], y_ceps, '-r', label='Y axis')
     plt.plot(acel_data[:, 0], z_ceps, '-g', label='Z axis')
     plt.title('Real Cepstrum Analysis')
-    plt.legend()
+    plt.legend(loc=1, fontsize=10)
     plt.xlabel('Time (s)')
     plt.ylabel('Amplitude (dB)')
 
