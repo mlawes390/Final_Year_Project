@@ -1,5 +1,6 @@
 # Final_Year_Project
-Data Acquisition and processing scripts for a wireless RDAQ for Vibration condition monitoring
+Data Acquisition and processing scripts for a wireless RDAQ for Vibration 
+condition monitoring 
 
 Master node is a Raspberry Pi.
 Sensor node is an ATmega328 with STMicroelectronics LIS3DH accelerometer
