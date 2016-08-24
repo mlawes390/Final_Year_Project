@@ -56,11 +56,40 @@ def acquisition():
         proc.wait()
 
 
+def upload_file(src, dest):
+    """
+    Upload a single file located (locally) at `src` to `dest`.
+    """
+    cmd = 'rsync --archive --compress {} {}'.format(src, dest)
+    cmd = shlex.split(cmd)
+    proc = subprocess.Popen(cmd)
+    proc.wait()
+    return proc.returncode
+
+
 def upload():
     """
-    Upload collected and processed data to a cloud server. Data older than two days
-    will be removed from master node.
+    Upload collected and processed data to a cloud server. Data older than
+    two days will be removed from master node.
     """
+    DESTINATION = 'matt@example.com:/var/daq-uploads'
+
+    # Assume data is saved to /path/to/data/
+    # TODO: Change the path to the data folder or make sure it's set with
+    # configuration
+    data_directory = '/path/to/data/'
+    data_files = os.listdir(data_directory)
+
+    # Iterate through data files, uploading them one at a time and then
+    # Deleting the file if upload was successful
+    for data_file in data_files:
+        full_name = os.path.join(data_directory, data_file)
+        ret = upload_file(full_name, DESTINATION)
+
+        if ret != 0:
+            print('Error occurred while uploading {}'.format(full_name))
+        else:
+            os.remove(full_name)
 
 
 def main():
