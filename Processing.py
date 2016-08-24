@@ -16,18 +16,21 @@ __version__ = '0.1.0'
 import os
 import docopt
 
+import math
 import numpy as np
 from numpy.fft import ifft
 import matplotlib.pyplot as plt
 from scipy.fftpack import fft
+from scipy import constants
 import scipy.stats
 
 
-def write_td(t, ax, mean, rms, p2v, cst, kts):
+def write_td(t, ax, mean, g_rms, v_rms, p2v, cst, kts):
     t.write("\n")
     t.write(ax + " Axis" + "\n")
     t.write("Mean (m/s^2): " + str(mean) + "\n")
-    t.write("G RMS (m/s^2): " + str(rms) + "\n")
+    t.write("G RMS (g): " + str(g_rms) + "\n")
+    t.write("V RMS (m/s): " + str(v_rms) + "\n")
     t.write("Peak to valley (m/s^2): " + str(p2v) + "\n")
     t.write("Crest Factor: " + str(cst) + "\n")
     t.write("Kurtosis: " + str(kts) + "\n")
@@ -42,7 +45,7 @@ def main(args):
 
     # carry out conversions (microseconds to seconds, g to m/s^2)
     acel_data[:, 0] = acel_data[:, 0] / 1000000
-    acel_data[:, 1:3] = acel_data[:, 1:3] * 9.81
+    acel_data[:, 1:3] = acel_data[:, 1:3] * constants.g
 
     # Define Frequency parameters
     n = len(acel_data[:, 0])  # Length of signal
@@ -53,17 +56,38 @@ def main(args):
     freq = freq[range(int(n / 2))]
 
     # Compute fft and single sided amplitude spectrum
-    x_fft = np.abs(fft(acel_data[:, 1]))
-    x_am = np.abs(x_fft[range(int(n / 2))] / n)
-    y_fft = np.abs(fft(acel_data[:, 2]))
-    y_am = np.abs(y_fft[range(int(n / 2))] / n)
-    z_fft = np.abs(fft(acel_data[:, 3]))
-    z_am = np.abs(z_fft[range(int(n / 2))] / n)
+    acel_f = np.zeros((n,3))
+    acel_f[:, 0] = np.abs(fft(acel_data[:, 1]))
+    x_am = np.abs(acel_f[:, 0][range(int(n / 2))] / n)
+    acel_f[:,1] = np.abs(fft(acel_data[:, 2]))
+    y_am = np.abs(acel_f[:, 1][range(int(n / 2))] / n)
+    acel_f[:,2] = np.abs(fft(acel_data[:, 3]))
+    z_am = np.abs(acel_f[:, 2][range(int(n / 2))] / n)
 
     # Compute real Cepstrum
-    x_ceps = np.real(ifft(np.log(x_fft)))
-    y_ceps = np.real(ifft(np.log(y_fft)))
-    z_ceps = np.real(ifft(np.log(z_fft)))
+    x_ceps = np.real(ifft(np.log(acel_f[:, 0])))
+    y_ceps = np.real(ifft(np.log(acel_f[:, 1])))
+    z_ceps = np.real(ifft(np.log(acel_f[:, 2])))
+
+    # Divide acceleration data by frequency to obtain velocity data
+    bin_num_a = np.arange(0,n/2,1)
+    bin_num_b = np.arange(n/2,0,-1)
+    bin_num = np.append(bin_num_a,bin_num_b)
+    f_bin = 2*np.pi*bin_num*fs/n
+
+    vel_f = acel_f / f_bin[:, None]
+
+    # Apply 3 Hz filter
+    n_df = 3
+    nfilt = math.floor(n_df/(fs/n))
+    vel_f[0:nfilt, :] = 0
+    vel_f[n-nfilt:n, :] = 0
+
+    #
+    vel_data = np.zeros((n,3))
+    vel_data[:, 0] = np.real(ifft(vel_f[:, 0]))
+    vel_data[:, 1] = np.real(ifft(vel_f[:, 1]))
+    vel_data[:, 2] = np.real(ifft(vel_f[:, 2]))
 
     plt.figure(figsize=(12.8, 7.2), dpi=100)
     # Plot Time Domain
@@ -106,8 +130,9 @@ def main(args):
     min_ = np.amin(acel_data[:, 1:], axis=0)
     max_ = np.amax(acel_data[:, 1:], axis=0)
     p2v = max_ - min_
-    rms = np.sqrt(np.mean(np.square(acel_data[:, 1:]), axis=0))
-    cst = p2v / rms
+    grms = np.sqrt(np.mean(np.square(acel_data[:, 1:]), axis=0))/constants.g
+    vrms = np.sqrt(np.mean(np.square(vel_data), axis=0))
+    cst = p2v / grms
     kts = scipy.stats.kurtosis(acel_data[:, 1:])
 
     # Write time domain parameters to text file
@@ -116,7 +141,7 @@ def main(args):
         t.write("Number of Samples: " + str(n) + "\n")
         t.write("Sample rate (Hz): " + str(fs) + "\n")
         for i in range(3):
-            write_td(t, ax[i], mean[i], rms[i], p2v[i], cst[i], kts[i])
+            write_td(t, ax[i], mean[i], grms[i], vrms[i], p2v[i], cst[i], kts[i])
 
 
 if __name__ == '__main__':
