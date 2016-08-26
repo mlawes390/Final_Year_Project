@@ -105,6 +105,7 @@ def main(args):
     plt.plot(freq[1:], x_am[1:], '-b', label='X axis')
     plt.plot(freq[1:], y_am[1:], '-r', label='Y axis')
     plt.plot(freq[1:], z_am[1:], '-g', label='Z axis')
+    plt.yscale('log')
     plt.title('Frequency Domain')
     plt.legend(loc=1, fontsize=10)
     plt.xlabel('Frequency (Hz)')
