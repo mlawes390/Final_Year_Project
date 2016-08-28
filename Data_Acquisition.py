@@ -7,7 +7,7 @@ Usage: Data_Acquisition.py [options]
 
 Options:
     -o=SAVE_FILE           The file to write to [Default: ./data.csv]
-    -b=BAUD --baud=BAUD    The Baud Rate [Default: 9600]
+    -b=BAUD --baud=BAUD    The Baud Rate [Default: 115200]
     -p=PORT --port=PORT    The serial port to listen to [Default: /dev/ttyUSB0]
     -t=TIMEOUT --timeout=TIMEOUT
                            Set the timeout for the read operation [Default: 5]
