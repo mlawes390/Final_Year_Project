@@ -2,10 +2,9 @@ import os
 import subprocess
 import shlex
 import re
-import scheduler
+import schedule
 import time
 import datetime
-import dropbox
 
 
 def gen_filename(rfcomm, now):
@@ -39,12 +38,14 @@ def acquisition():
     Poll accelerometer, store collected data in .csv file and process data to produce
     time domain and frequency domain figures and parameters.
     """
+    data_directory = './Accelerometer Data'
     for rfcomm in rfcomms():
         now = datetime.datetime.now()
         filename = gen_filename(rfcomm, now)
+        full_name = os.path.join(data_directory, filename)
 
         # Poll sensor and save to .csv
-        cmd = 'python3 Data_acquisition.py -o {} -p {}'.format(filename, rfcomm)
+        cmd = 'python3 Data_acquisition.py -o {} -p {}'.format(full_name, rfcomm)
         cmd = shlex.split(cmd)
         proc = subprocess.Popen(cmd)
         proc.wait()
@@ -75,9 +76,7 @@ def upload():
     DESTINATION = 'matt@example.com:/var/daq-uploads'
 
     # Assume data is saved to /path/to/data/
-    # TODO: Change the path to the data folder or make sure it's set with
-    # configuration
-    data_directory = '/path/to/data/'
+    data_directory = './Accelerometer Data'
     data_files = os.listdir(data_directory)
 
     # Iterate through data files, uploading them one at a time and then
