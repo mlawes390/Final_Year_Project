@@ -31,7 +31,10 @@ def main(args):
                         baudrate=int(args['--baud']),
                         timeout=int(args['--timeout']))
     # Allow time for serial to initlise and send start byte
-    time.sleep(10)
+    time.sleep(5)
+    #Send wake byte
+    ser.write(b'w')
+    time.sleep(2)
 
     # open .csv file with write
     with open(save_file, 'w') as f:
