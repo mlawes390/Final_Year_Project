@@ -33,7 +33,7 @@ def rfcomms():
     return ports
 
 
-def acquisition():
+def acquisition(config):
     """
     Poll accelerometer, store collected data in .csv file and process data to produce
     time domain and frequency domain figures and parameters.
@@ -68,15 +68,18 @@ def upload_file(src, dest):
     return proc.returncode
 
 
-def upload():
+def upload(config):
     """
     Upload collected and processed data to a cloud server. Data older than
     two days will be removed from master node.
     """
-    DESTINATION = 'matt@example.com:/var/daq-uploads'
+    login_details = config['repo']
+    DESTINATION = '{}@{}:{}'.format(login_details['user'],
+                                    login_details['host'],
+                                    login_details['path'])
 
     # Assume data is saved to /path/to/data/
-    data_directory = './Accelerometer Data'
+    data_directory = config['data-directory']
     data_files = os.listdir(data_directory)
 
     # Iterate through data files, uploading them one at a time and then
@@ -92,7 +95,16 @@ def upload():
 
 
 def main():
-    schedule.every(15).minutes.do(acquisition)
+    config = {
+            'data-directory': './Accelerometer Data',
+            'repo': {
+                'user': 'matt',
+                'host': 'example.com',
+                'path': '/home/matt/Vib-data/'
+                }
+            }
+
+    schedule.every(15).minutes.do(acquisition, config)
     schedule.every().day.at("18:00").do(upload)
 
     while True:
