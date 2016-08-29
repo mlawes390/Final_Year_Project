@@ -33,12 +33,13 @@ def rfcomms():
     return ports
 
 
-def acquisition():
+def acquisition(config):
     """
     Poll accelerometer, store collected data in .csv file and process data to produce
     time domain and frequency domain figures and parameters.
     """
-    data_directory = './Accelerometer Data'
+    data_directory = config['data-directory']
+
     for rfcomm in rfcomms():
         now = datetime.datetime.now()
         filename = gen_filename(rfcomm, now)
@@ -51,7 +52,7 @@ def acquisition():
         proc.wait()
 
         # Process data
-        cmd = 'python3 processing.py -o {}'.format(filename)
+        cmd = 'python3 processing.py -o {}'.format(full_name)
         cmd = shlex.split(cmd)
         proc = subprocess.Popen(cmd)
         proc.wait()
@@ -68,15 +69,18 @@ def upload_file(src, dest):
     return proc.returncode
 
 
-def upload():
+def upload(config):
     """
     Upload collected and processed data to a cloud server. Data older than
     two days will be removed from master node.
     """
-    DESTINATION = 'matt@example.com:/var/daq-uploads'
+    login_details = config['repo']
+    DESTINATION = '{}@{}:{}'.format(login_details['user'],
+                                    login_details['host'],
+                                    login_details['path'])
 
     # Assume data is saved to /path/to/data/
-    data_directory = './Accelerometer Data'
+    data_directory = config['data-directory']
     data_files = os.listdir(data_directory)
 
     # Iterate through data files, uploading them one at a time and then
@@ -92,8 +96,18 @@ def upload():
 
 
 def main():
-    schedule.every(15).minutes.do(acquisition)
-    schedule.every().day.at("18:00").do(upload)
+    config = {
+        'data-directory': './Accelerometer Data',
+        'repo': {
+            'user': 'matt',
+            'host': '128.199.153.103',
+            'path':'/home/matt/Vib_data/'
+        }
+    }
+
+
+    schedule.every(15).minutes.do(acquisition, config)
+    schedule.every().day.at("18:00").do(upload, config)
 
     while True:
         schedule.run_pending()
