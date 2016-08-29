@@ -38,7 +38,8 @@ def acquisition(config):
     Poll accelerometer, store collected data in .csv file and process data to produce
     time domain and frequency domain figures and parameters.
     """
-    data_directory = './Accelerometer Data'
+    data_directory = config['data-directory']
+
     for rfcomm in rfcomms():
         now = datetime.datetime.now()
         filename = gen_filename(rfcomm, now)
@@ -51,7 +52,7 @@ def acquisition(config):
         proc.wait()
 
         # Process data
-        cmd = 'python3 processing.py -o {}'.format(filename)
+        cmd = 'python3 processing.py -o {}'.format(full_name)
         cmd = shlex.split(cmd)
         proc = subprocess.Popen(cmd)
         proc.wait()
@@ -96,16 +97,16 @@ def upload(config):
 
 def main():
     config = {
-            'data-directory': './Accelerometer Data',
-            'repo': {
-                'user': 'matt',
-                'host': 'example.com',
-                'path': '/home/matt/Vib-data/'
-                }
-            }
+        'data-directory': './Accelerometer Data',
+        'repo': {
+            'user': 'matt',
+            'host': '128.199.153.103',
+            'path':'/home/matt/Vib_data/'
+        }
+    }
 
     schedule.every(15).minutes.do(acquisition, config)
-    schedule.every().day.at("18:00").do(upload)
+    schedule.every().day.at("18:00").do(upload, config)
 
     while True:
         schedule.run_pending()
