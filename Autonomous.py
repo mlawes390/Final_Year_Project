@@ -28,8 +28,8 @@ def rfcomms():
     """
     ports = []
     for device in os.listdir('/dev/'):
-        if device.startswith('/dev/rfcomm'):
-            ports.append(device)
+        if device.startswith('rfcomm'):
+            ports.append('/dev/' + device)
     return ports
 
 
@@ -46,7 +46,7 @@ def acquisition(config):
         full_name = os.path.join(data_directory, filename)
 
         # Poll sensor and save to .csv
-        cmd = 'python3 Data_acquisition.py -o {} -p {}'.format(full_name, rfcomm)
+        cmd = 'python3 Data_Acquisition.py -o {} -p {}'.format(full_name, rfcomm)
         cmd = shlex.split(cmd)
         proc = subprocess.Popen(cmd)
         proc.wait()
