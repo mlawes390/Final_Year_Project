@@ -52,7 +52,7 @@ def acquisition(config):
         proc.wait()
 
         # Process data
-        cmd = 'python3 processing.py -o {}'.format(full_name)
+        cmd = 'python Processing.py -o {}'.format(full_name)
         cmd = shlex.split(cmd)
         proc = subprocess.Popen(cmd)
         proc.wait()
