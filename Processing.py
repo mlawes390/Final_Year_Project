@@ -45,7 +45,7 @@ def main(args):
 
     # carry out conversions (microseconds to seconds, g to m/s^2)
     acel_data[:, 0] = acel_data[:, 0] / 1000000
-    acel_data[:, 1:3] = acel_data[:, 1:3] * constants.g
+    acel_data[:, 1:] = acel_data[:, 1:] * constants.g
 
     # Define Frequency parameters
     n = len(acel_data[:, 0])  # Length of signal
@@ -131,7 +131,7 @@ def main(args):
     min_ = np.amin(acel_data[:, 1:], axis=0)
     max_ = np.amax(acel_data[:, 1:], axis=0)
     p2v = max_ - min_
-    grms = np.sqrt(np.mean(np.square(acel_data[:, 1:]), axis=0))/constants.g
+    grms = np.sqrt(np.mean(np.square(acel_data[:, 1:]), axis=0)) / constants.g
     vrms = np.sqrt(np.mean(np.square(vel_data), axis=0))
     cst = p2v / grms
     kts = scipy.stats.kurtosis(acel_data[:, 1:])
