@@ -14,7 +14,9 @@ Options:
 __version__ = '0.1.0'
 
 import os
+import sys
 import docopt
+import warnings
 
 import math
 import numpy as np
@@ -40,8 +42,16 @@ def main(args):
     read_file = args.get('-o', './test.csv')
     (path, extension) = os.path.splitext(read_file)
 
+    warnings.simplefilter('error', UserWarning)
+
     # Read input file into a numpy array
-    acel_data = np.genfromtxt(read_file, delimiter=",")
+    while True:
+        try:
+            acel_data = np.genfromtxt(read_file, delimiter=",")
+            break
+        except UserWarning:
+            print("Error: Empty input file")
+            sys.exit(0)
 
     # carry out conversions (microseconds to seconds, g to m/s^2)
     acel_data[:, 0] = acel_data[:, 0] / 1000000
@@ -75,7 +85,9 @@ def main(args):
     bin_num = np.append(bin_num_a,bin_num_b)
     f_bin = 2*np.pi*bin_num*fs/n
 
-    vel_f = acel_f / f_bin[:, None]
+    with np.errstate(divide='ignore'):
+        vel_f = acel_f / f_bin[:, None]
+
 
     # Apply 3 Hz filter
     n_df = 3
