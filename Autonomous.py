@@ -97,7 +97,7 @@ def upload(config):
 
 def main():
     config = {
-        'data-directory': './Accelerometer Data',
+        'data-directory': './Accelerometer_data',
         'repo': {
             'user': 'matt',
             'host': '128.199.153.103',
