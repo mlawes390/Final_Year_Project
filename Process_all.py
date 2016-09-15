@@ -49,7 +49,7 @@ def main():
         proc.wait()
 
         # Process data
-        cmd = 'python Processing.py -o {}'.format(full_name)
+        cmd = 'python3 Processing.py -o {}'.format(full_name)
         cmd = shlex.split(cmd)
         proc = subprocess.Popen(cmd)
         proc.wait()
