@@ -44,7 +44,7 @@ def main(args):
             while True:
                 raw = ser.read(16)
                 if len(raw)==0:
-                    print('Program End')
+                    #print('Program End')
                     sys.exit(0)
                 data = struct.unpack('Ifff',raw)
                 writer.writerow(data)
