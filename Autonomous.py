@@ -40,22 +40,31 @@ def acquisition(config):
     """
     data_directory = config['data-directory']
 
+    start = datetime.datetime.now()
+    start_str = start.strftime('%Y-%m-%d_%H:%M:%S')
+    print('Sampling Sequence Start {}'.format(start_str))
+
+    count = 1
+
     for rfcomm in rfcomms():
         now = datetime.datetime.now()
         filename = gen_filename(rfcomm, now)
         full_name = os.path.join(data_directory, filename)
 
         # Poll sensor and save to .csv
+        print('Sampling {}'.format(count))
         cmd = 'python3 Data_Acquisition.py -o {} -p {}'.format(full_name, rfcomm)
         cmd = shlex.split(cmd)
         proc = subprocess.Popen(cmd)
         proc.wait()
 
         # Process data
+        print('Processing {}'.format(count))
         cmd = 'python3 Processing.py -o {}'.format(full_name)
         cmd = shlex.split(cmd)
         proc = subprocess.Popen(cmd)
         proc.wait()
+        count += 1
 
 
 def upload_file(src, dest):
@@ -83,6 +92,8 @@ def upload(config):
     data_directory = config['data-directory']
     data_files = os.listdir(data_directory)
 
+    print('Uploading Files')
+
     # Iterate through data files, uploading them one at a time and then
     # Deleting the file if upload was successful
     for data_file in data_files:
@@ -108,9 +119,14 @@ def main():
     schedule.every(15).minutes.do(acquisition, config)
     schedule.every().day.at("18:00").do(upload, config)
 
-    while True:
-        schedule.run_pending()
-        time.sleep(1)
+    try:
+        while True:
+            schedule.run_pending()
+            time.sleep(1)
+    except KeyboardInterrupt:
+        #end read when keyboard interrupt
+        print('Program end: User interrupt')
+        sys.exit(0)
 
 
 if __name__ == "__main__":
