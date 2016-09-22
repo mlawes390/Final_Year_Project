@@ -145,7 +145,7 @@ def main(args):
     p2v = max_ - min_
     grms = np.sqrt(np.mean(np.square(acel_data[:, 1:]), axis=0)) / constants.g
     vrms = np.sqrt(np.mean(np.square(vel_data), axis=0))
-    cst = p2v / grms
+    cst = p2v / (grms * constants.g)
     kts = scipy.stats.kurtosis(acel_data[:, 1:])
 
     # Write time domain parameters to text file
