@@ -30,12 +30,12 @@ import scipy.stats
 def write_td(t, ax, mean, g_rms, v_rms, p2v, cst, kts):
     t.write("\n")
     t.write(ax + " Axis" + "\n")
-    t.write("Mean (m/s^2): " + str(mean) + "\n")
-    t.write("G RMS (g): " + str(g_rms) + "\n")
-    t.write("V RMS (m/s): " + str(v_rms) + "\n")
-    t.write("Peak to valley (m/s^2): " + str(p2v) + "\n")
-    t.write("Crest Factor: " + str(cst) + "\n")
-    t.write("Kurtosis: " + str(kts) + "\n")
+    t.write("Mean (m/s^2): {:.3e}\n".format(mean))
+    t.write("G RMS (g):  {:.3e}\n".format(g_rms))
+    t.write("V RMS (m/s): {:.3e}\n".format(v_rms))
+    t.write("Peak to valley (m/s^2): {:.3f}\n".format(p2v))
+    t.write("Crest Factor: {:.3f}\n".format(cst))
+    t.write("Kurtosis: {:.3f}\n".format(kts))
 
 
 def main(args):
