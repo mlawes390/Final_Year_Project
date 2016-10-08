@@ -61,11 +61,11 @@ void loop() {
   Serial.println("Ready to Sample?");
   while (!Serial.available());
   sample(w[0][0], w[0][1], w[0][2]);
-  Serial.print(w[0][0]);Serial.print(w[0][1]);Serial.println(w[0][2]);
   while (Serial.available() > 0) {
     Serial.read();
   }
   delay(300);
+    
   Serial.println("Place accelerometer with Z axis face down");
   Serial.println("Ready to Sample?");
   while (!Serial.available());
