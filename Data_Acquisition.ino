@@ -79,6 +79,7 @@ void loop() {
         Serial.write(x_acel.x_b, 4);
         Serial.write(y_acel.y_b, 4);
         Serial.write(z_acel.z_b, 4);
+        delayMicroseconds(1640);
       }
     }
     count=0;
